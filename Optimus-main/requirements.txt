@@ -1,0 +1,7 @@
+websocket-client
+requests
+python-binance
+ta
+pandas
+python-dotenv
+PerplexiPy

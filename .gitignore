@@ -1,0 +1,6 @@
+.env
+__pycache__/
+*.pyc
+snapshot.csv
+oversold_symbols.json
+execution_plan.csv
