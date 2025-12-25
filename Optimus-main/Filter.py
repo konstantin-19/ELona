@@ -49,13 +49,8 @@ def generate_signals(rsi):
     return "HOLD"
 
 def get_oversold_symbols():
-
-    try:
-        with open('oversold_symbols.json', 'r') as f:
-            found_oversold = json.load(f)
-        print(f"Loaded {len(found_oversold)} existing oversold symbols")
-    except (FileNotFoundError, json.JSONDecodeError):
-        found_oversold = []
+    """Scan for oversold symbols - starts fresh each run."""
+    found_oversold = []
 
     print(f"Scanning {len(symbols)} symbols...")
 
