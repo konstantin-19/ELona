@@ -1,45 +1,43 @@
-import websocket
-import requests
-import json
-import binance.client as Client
+import time
+from websocket_manager import get_websocket_manager
 
 
 MIN_VOLUME = 20_000_000
 
-client = Client()
 
-URL = f"wss://stream.binance.com:9443/ws/!miniTicker@arr"
-def on_open(ws):
-    print("connect to the socket")
+def on_ticker_data(data):
+    if not isinstance(data, list):
+        return
 
-def on_message(ws,message):
-    data = json.loads(message)
     for ticker in data:
         if ticker.get('e') == "24hrMiniTicker":
-           symbol = ticker.get('s')
-           price = ticker.get('c')
-           volume = float(ticker.get('q', 0))
-              
-           if any(symbol.endswith(suffix) for suffix in ['USDT']):
-              if volume > 20_000_000:
-                print(f"|symbol{symbol}|price={price}|volume={volume}|")
+            symbol = ticker.get('s')
+            price = ticker.get('c')
+            volume = float(ticker.get('q', 0))
+
+            if symbol.endswith('USDT') and volume > MIN_VOLUME:
+                print(f"|symbol={symbol}|price={price}|volume={volume}|")
 
 
-def on_close(close_status_code,close_msg):
-    print("connection lost",close_status_code,close_msg)
+def main():
+    manager = get_websocket_manager()
+    manager.start()
 
-def on_error(ws,error):
-    print("websocket error",error)
+    print("Waiting for WebSocket connection...")
+    if not manager.wait_for_connection(timeout=30):
+        print("Failed to connect to WebSocket")
+        return
 
-ws = websocket.WebSocketApp(URL,
-                            on_message=on_message,
-                            on_error=on_error,
-                            on_open=on_open,
-                            on_close = on_close)
+    print("Connected! Subscribing to mini ticker stream...")
+    manager.subscribe("!miniTicker@arr", on_ticker_data)
 
-ws.run_forever()
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\nStopping Data.py...")
+        manager.stop()
 
-def get_binance_client_info():
-    pass
 
-
+if __name__ == "__main__":
+    main()
