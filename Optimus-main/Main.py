@@ -17,7 +17,7 @@ if __name__ == "__main__":
     print("   - Create oversold_symbols.json")
     print("   - Start WebSocket monitoring\n")
 
-    time.sleep(30)
+    time.sleep(10)
 
     print("="*80)
     print("📌 Starting Indicators.py...")
